@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Profile {
+  id            Int     @id @default(autoincrement())
+  name          String
+  initials      String
+  url           String
+  location      String
+  locationLink  String
+  description   String
+  summary       String
+  avatarUrl     String
+  email         String
+  tel           String
+  githubUsername String @default("")
+  calLink       String @default("")
+  cvUrl         String @default("")
+}
+
+model Skill {
+  id   Int    @id @default(autoincrement())
+  name String
+  icon String
+  sort Int    @default(0)
+}
+
+model Work {
+  id          Int    @id @default(autoincrement())
+  company     String
+  href        String
+  location    String
+  title       String
+  logoUrl     String
+  start       String
+  end         String
+  description String
+  sort        Int    @default(0)
+}
+
+model Education {
+  id      Int    @id @default(autoincrement())
+  school  String
+  href    String
+  degree  String
+  logoUrl String
+  start   String
+  end     String
+  sort    Int    @default(0)
+}
+
+model Project {
+  id          Int     @id @default(autoincrement())
+  title       String
+  href        String
+  dates       String
+  active      Boolean @default(true)
+  description String
+  image       String  @default("")
+  video       String  @default("")
+  sort        Int     @default(0)
+  technologies ProjectTechnology[]
+  links       ProjectLink[]
+}
+
+model ProjectTechnology {
+  id        Int    @id @default(autoincrement())
+  projectId Int
+  name      String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectLink {
+  id        Int    @id @default(autoincrement())
+  projectId Int
+  type      String
+  href      String
+  icon      String  @default("globe")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Hackathon {
+  id          Int    @id @default(autoincrement())
+  title       String
+  dates       String
+  location    String
+  description String
+  image       String
+  win         String @default("")
+  mlh         String @default("")
+  sort        Int    @default(0)
+  links       HackathonLink[]
+}
+
+model HackathonLink {
+  id         Int    @id @default(autoincrement())
+  hackathonId Int
+  title      String
+  href       String
+  icon       String  @default("globe")
+  hackathon  Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+}
+
+model SocialLink {
+  id     Int    @id @default(autoincrement())
+  name   String
+  url    String
+  icon   String
+  navbar Boolean @default(false)
+  sort   Int     @default(0)
+}
+
+model NavbarItem {
+  id    Int    @id @default(autoincrement())
+  href  String
+  icon  String
+  label String
+  sort  Int    @default(0)
+}
+
+model AdminUser {
+  id           Int    @id @default(autoincrement())
+  username     String @unique
+  passwordHash String
+}
