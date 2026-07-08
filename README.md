@@ -255,4 +255,3 @@ The database contains the following models:
 ## License
 
 Licensed under the [MIT license](LICENSE).
-# David
