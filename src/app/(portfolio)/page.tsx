@@ -3,7 +3,7 @@ import BlurFade from "@/components/magicui/blur-fade";
 import BlurFadeText from "@/components/magicui/blur-fade-text";
 import TopNav from "@/components/top-nav";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getPortfolioData } from "@/lib/portfolio";
+import { getPortfolioData, type PortfolioData } from "@/lib/portfolio";
 import Link from "next/link";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
@@ -24,9 +24,35 @@ function extractYear(dates: string): string | null {
 }
 
 export default async function Page() {
-  const data = await getPortfolioData();
-  const profile = data.profile!;
+  let data: PortfolioData;
+  try {
+    data = await getPortfolioData();
+  } catch {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight">Portfolio</h1>
+          <p className="text-muted-foreground">Could not load data. Make sure the database is running and seeded.</p>
+          <a href="/login" className="inline-block mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">Go to Login</a>
+        </div>
+      </div>
+    );
+  }
+
+  const profile = data.profile;
   const skills = data.skills || [];
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight">Portfolio not set up yet</h1>
+          <p className="text-muted-foreground">Run <code className="text-sm bg-muted px-1.5 py-0.5 rounded">pnpm seed</code> to seed the database, or log in to the dashboard to add content.</p>
+          <a href="/login" className="inline-block mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">Go to Login</a>
+        </div>
+      </div>
+    );
+  }
   const education = data.education || [];
   const projects = data.projects || [];
   const hackathons = data.hackathons || [];
