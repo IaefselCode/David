@@ -47,6 +47,7 @@ export default function TopNav({ sections }: { sections: { id: string; label: st
     if (activeEl) {
       indicatorLeft.set(activeEl.offsetLeft);
       indicatorWidth.set(activeEl.offsetWidth);
+      activeEl.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
     }
   }, [activeSection, indicatorLeft, indicatorWidth]);
 
@@ -66,7 +67,7 @@ export default function TopNav({ sections }: { sections: { id: string; label: st
     <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
       <nav
         ref={navRef}
-        className="pointer-events-auto relative flex items-center gap-0.5 px-2 py-1.5 rounded-2xl border border-border/40 bg-background/60 backdrop-blur-2xl shadow-[0_0_30px_5px] shadow-primary/5"
+        className="pointer-events-auto relative flex items-center gap-0.5 px-1.5 sm:px-2 py-1.5 rounded-2xl border border-border/40 bg-background/60 backdrop-blur-2xl shadow-[0_0_30px_5px] shadow-primary/5 overflow-x-auto scrollbar-none max-w-[calc(100vw-24px)] snap-x snap-mandatory"
       >
         <motion.div
           ref={indicatorRef}
@@ -85,7 +86,7 @@ export default function TopNav({ sections }: { sections: { id: string; label: st
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
             className={cn(
-              "relative z-10 text-xs font-medium px-3 py-1.5 rounded-xl transition-all duration-200 whitespace-nowrap cursor-pointer select-none",
+              "relative z-10 text-[11px] sm:text-xs font-medium px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl transition-all duration-200 whitespace-nowrap cursor-pointer select-none snap-start",
               activeSection === id
                 ? "text-primary"
                 : "text-muted-foreground/70 hover:text-foreground"
