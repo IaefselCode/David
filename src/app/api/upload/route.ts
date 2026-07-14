@@ -16,17 +16,19 @@ export async function POST(req: Request) {
     const ext = file.name.split(".").pop();
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
-    const token = process.env.BLOB_READ_WRITE_TOKEN;
-    if (!token) {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-      await mkdir(uploadDir, { recursive: true });
-      await writeFile(path.join(uploadDir, filename), buffer);
-      return NextResponse.json({ url: `/uploads/${filename}` });
+    const useBlob =
+      process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_ENV === "production";
+
+    if (useBlob) {
+      const blob = await put(filename, file, { access: "public" });
+      return NextResponse.json({ url: blob.url });
     }
 
-    const blob = await put(filename, file, { access: "public", token });
-    return NextResponse.json({ url: blob.url });
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    await mkdir(uploadDir, { recursive: true });
+    await writeFile(path.join(uploadDir, filename), buffer);
+    return NextResponse.json({ url: `/uploads/${filename}` });
   } catch (e) {
     console.error("Upload error:", e instanceof Error ? e.message : e);
     console.error("Stack:", e instanceof Error ? e.stack : "");
