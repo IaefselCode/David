@@ -17,18 +17,19 @@ export async function POST(req: Request) {
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
     const token = process.env.BLOB_READ_WRITE_TOKEN;
-    if (token) {
-      const blob = await put(filename, file, { access: "public", token });
-      return NextResponse.json({ url: blob.url });
+    if (!token) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const uploadDir = path.join(process.cwd(), "public", "uploads");
+      await mkdir(uploadDir, { recursive: true });
+      await writeFile(path.join(uploadDir, filename), buffer);
+      return NextResponse.json({ url: `/uploads/${filename}` });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(path.join(uploadDir, filename), buffer);
-    return NextResponse.json({ url: `/uploads/${filename}` });
+    const blob = await put(filename, file, { access: "public", token });
+    return NextResponse.json({ url: blob.url });
   } catch (e) {
-    console.error("Upload failed:", e);
+    console.error("Upload error:", e instanceof Error ? e.message : e);
+    console.error("Stack:", e instanceof Error ? e.stack : "");
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }
