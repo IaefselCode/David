@@ -16,13 +16,16 @@ export async function POST(req: Request) {
     const ext = file.name.split(".").pop();
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
-    const useBlob =
-      process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_ENV === "production";
+    const useBlob = !!process.env.BLOB_READ_WRITE_TOKEN;
 
     if (useBlob) {
       const arrayBuffer = await file.arrayBuffer();
       const blob = await put(filename, arrayBuffer, { access: "public" });
       return NextResponse.json({ url: blob.url });
+    }
+
+    if (process.env.VERCEL_ENV === "production") {
+      return NextResponse.json({ error: "Blob storage not configured — add BLOB_READ_WRITE_TOKEN in Vercel dashboard > Storage > Blob" }, { status: 500 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
