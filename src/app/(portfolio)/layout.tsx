@@ -15,7 +15,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
           }}
         />
       </div>
-      <div className="relative z-10 max-w-2xl mx-auto pt-10 pb-24 sm:pt-14 px-6">
+      <div className="relative z-10 max-w-2xl mx-auto pt-16 pb-24 sm:pt-20 px-6">
         {children}
       </div>
       <Navbar />
