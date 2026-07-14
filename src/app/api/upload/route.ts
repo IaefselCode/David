@@ -15,13 +15,14 @@ export async function POST(req: Request) {
 
     const ext = file.name.split(".").pop();
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
 
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
-      const blob = await put(filename, buffer, { access: "public" });
+    const token = process.env.BLOB_READ_WRITE_TOKEN;
+    if (token) {
+      const blob = await put(filename, file, { access: "public", token });
       return NextResponse.json({ url: blob.url });
     }
 
+    const buffer = Buffer.from(await file.arrayBuffer());
     const uploadDir = path.join(process.cwd(), "public", "uploads");
     await mkdir(uploadDir, { recursive: true });
     await writeFile(path.join(uploadDir, filename), buffer);
