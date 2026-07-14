@@ -20,7 +20,8 @@ export async function POST(req: Request) {
       process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_ENV === "production";
 
     if (useBlob) {
-      const blob = await put(filename, file, { access: "public" });
+      const arrayBuffer = await file.arrayBuffer();
+      const blob = await put(filename, arrayBuffer, { access: "public" });
       return NextResponse.json({ url: blob.url });
     }
 
@@ -33,5 +34,20 @@ export async function POST(req: Request) {
     console.error("Upload error:", e instanceof Error ? e.message : e);
     console.error("Stack:", e instanceof Error ? e.stack : "");
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+  }
+}
+
+export async function GET() {
+  try {
+    const useBlob =
+      process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_ENV === "production";
+    return NextResponse.json({
+      env: process.env.VERCEL_ENV || "not set",
+      hasBlobToken: !!process.env.BLOB_READ_WRITE_TOKEN,
+      useBlob,
+      node: process.version,
+    });
+  } catch (e) {
+    return NextResponse.json({ error: String(e) }, { status: 500 });
   }
 }
