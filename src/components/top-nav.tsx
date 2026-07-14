@@ -16,13 +16,15 @@ export default function TopNav({ sections }: { sections: { id: string; label: st
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
+        let best: IntersectionObserverEntry | null = null;
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
+          if (entry.isIntersecting && (!best || entry.boundingClientRect.top < best.boundingClientRect.top)) {
+            best = entry;
           }
         }
+        if (best) setActiveSection(best.target.id);
       },
-      { rootMargin: "-40% 0px -40% 0px" }
+      { rootMargin: "-64px 0px -75% 0px" }
     );
 
     const elements: HTMLElement[] = [];
@@ -52,7 +54,8 @@ export default function TopNav({ sections }: { sections: { id: string; label: st
     e.preventDefault();
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
+      const top = el.getBoundingClientRect().top + window.scrollY - 72;
+      window.scrollTo({ top, behavior: "smooth" });
       setActiveSection(id);
     }
   };
