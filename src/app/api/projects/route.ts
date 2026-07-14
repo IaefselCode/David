@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { verifyToken } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   const items = await prisma.project.findMany({
@@ -22,5 +23,6 @@ export async function POST(request: Request) {
     },
     include: { technologies: true, links: true },
   });
+  revalidatePath("/", "layout");
   return NextResponse.json(item);
 }

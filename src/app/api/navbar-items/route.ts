@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { verifyToken } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   const items = await prisma.navbarItem.findMany({ orderBy: { sort: "asc" } });
@@ -13,5 +14,6 @@ export async function POST(request: Request) {
 
   const data = await request.json();
   const item = await prisma.navbarItem.create({ data });
+  revalidatePath("/", "layout");
   return NextResponse.json(item);
 }

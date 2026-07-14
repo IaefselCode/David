@@ -16,6 +16,8 @@ import { getIcon } from "@/lib/icons-map";
 import GitHubActivity from "@/components/github-activity";
 import { ArrowUpRight, MapPin, Mail, Globe, FileDown } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 const BLUR_FADE_DELAY = 0.04;
 
 function extractYear(dates: string): string | null {

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { verifyToken } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   const items = await prisma.education.findMany({ orderBy: { sort: "desc" } });
@@ -12,5 +13,6 @@ export async function POST(request: Request) {
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const data = await request.json();
   const item = await prisma.education.create({ data });
+  revalidatePath("/", "layout");
   return NextResponse.json(item);
 }

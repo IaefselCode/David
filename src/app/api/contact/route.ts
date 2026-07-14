@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { verifyToken } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   const [profile, socialLinks, navbarItems] = await Promise.all([
@@ -33,5 +34,6 @@ export async function PUT(request: Request) {
     }
   }
 
+  revalidatePath("/", "layout");
   return NextResponse.json({ success: true });
 }
